@@ -48,9 +48,9 @@ np.random.seed(SEED)
 
 CFG = {
     # ── Paths ────────────────────────────────────────────────────────────────
-    "train_path" : "/tmp/credit_score_cleaned_train.csv",          # ← change for real data
+    "train_path" : r"D:/data science related/Internships/M_L/CodeAlpha_Credit-Score-Model/train_data.csv",          # ← change for real data
     "test_path"  : None,                                            # ← set if test CSV exists
-    "output_dir" : Path("/mnt/user-data/outputs"),
+    "output_dir" : r"D:/data science related/Internships/M_L/CodeAlpha_Credit-Score-Model/train_output.csv",
     # ── Modelling ────────────────────────────────────────────────────────────
     "target"     : "credit_score",
     "n_classes"  : 3,
