@@ -22,9 +22,8 @@ import seaborn as sns
 
 # ─── Machine Learning Core ────────────────────────────────────────────────────
 from sklearn.model_selection  import StratifiedKFold
-from sklearn.preprocessing    import LabelEncoder, RobustScaler
-from sklearn.metrics          import (f1_score, accuracy_score,
-                                      classification_report, confusion_matrix)
+from sklearn.preprocessing    import LabelEncoder
+from sklearn.metrics          import f1_score, accuracy_score,classification_report, confusion_matrix
 
 # ─── Boosting Ensemble ────────────────────────────────────────────────────────
 import lightgbm  as lgb
@@ -32,9 +31,9 @@ import xgboost   as xgb
 from catboost   import CatBoostClassifier
 
 # ─── Hyperparameter Optimization ──────────────────────────────────────────────
-import optuna
+import optuna;optuna.logging.set_verbosity(optuna.logging.WARNING)
 from optuna.samplers import TPESampler
-optuna.logging.set_verbosity(optuna.logging.WARNING)
+
 
 # ─── Explainability ───────────────────────────────────────────────────────────
 import shap
@@ -45,62 +44,33 @@ import joblib
 # ══════════════════════════════════════════════════════════════════════════════
 SEED = 42
 np.random.seed(SEED)
+OUT = Path(r"D:/data science related/Internships/M_L/CodeAlpha_Credit-Score-Model/train_output.csv")
 
-CFG = {
-    # ── Paths ────────────────────────────────────────────────────────────────
-    "train_path" : r"D:/data science related/Internships/M_L/CodeAlpha_Credit-Score-Model/train_data.csv",          # ← change for real data
-    "test_path"  : None,                                            # ← set if test CSV exists
-    "output_dir" : r"D:/data science related/Internships/M_L/CodeAlpha_Credit-Score-Model/train_output.csv",
-    # ── Modelling ────────────────────────────────────────────────────────────
-    "target"     : "credit_score",
-    "n_classes"  : 3,
-    "n_folds"    : 5,
-    "n_trials_lgb": 40,
-    "n_trials_xgb": 35,
-    "n_trials_cat": 30,
-    "seed"       : SEED,
-    # ── Columns to drop ──────────────────────────────────────────────────────
-    "drop_cols"  : ["id", "customer_id", "name", "ssn"],
-    # ── Label map ────────────────────────────────────────────────────────────
-    "label_map"  : {0: "Poor", 1: "Standard", 2: "Good"},
-    "class_colors": ["#e74c3c", "#f39c12", "#2ecc71"],
-}
+for s in ["models", "charts", "reports"]:
+    (OUT/s).mkdir(parents=True, exist_ok=True)
 
-for sub in ["models", "charts", "reports"]:
-    (CFG["output_dir"] / sub).mkdir(parents=True, exist_ok=True)
+# ── Label map ────────────────────────────────────────────────────────────
+LABLE_MAP={0: "Poor", 1: "Standard", 2: "Good"}
+COLORS=["#e74c3c", "#f39c12", "#2ecc71"]
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ❷  LOGGER
 # ══════════════════════════════════════════════════════════════════════════════
-ICONS = {"INFO":"📋","OK":"✅","WARN":"⚠️","ERR":"❌","MODEL":"🤖","CHART":"📊","SAVE":"💾"}
-
-def log(msg: str, level: str = "INFO") -> None:
-    ts = datetime.now().strftime("%H:%M:%S")
-    print(f"[{ts}] {ICONS.get(level,'•')} {msg}", flush=True)
+def log(m, l="INFO"):
+    ICONS= {"INFO":"📋","OK":"✅","WARN":"⚠️","ERR":"❌","MODEL":"🤖","CHART":"📊","SAVE":"💾"}
+    print(f"[{datetime.now().strftime("%-H:%M")}] {ICONS.get(l,'*')} {m}",flush=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ❸  STEP 1 — DATA LOADING
 # ══════════════════════════════════════════════════════════════════════════════
-def load_data():
-    """Load train (and optionally test) CSV; handle zip/gz transparently."""
-    log("Loading data…")
-    train = pd.read_csv(CFG["train_path"])
-    log(f"Train  →  {train.shape[0]:>6,} rows × {train.shape[1]} cols", "OK")
+log("Loading data..")
+train = pd.read_csv("D:/data science related/Internships/M_L/CodeAlpha_Credit-Score-Model/train_data.csv")
+log(f"Train shape : {train.shape}", "OK")
 
-    test = None
-    if CFG["test_path"] and Path(CFG["test_path"]).exists():
-        test = pd.read_csv(CFG["test_path"])
-        log(f"Test   →  {test.shape[0]:>6,} rows × {test.shape[1]} cols", "OK")
-
-    # Basic sanity checks
-    assert CFG["target"] in train.columns, f"Target '{CFG['target']}' not found!"
-    n_missing = train.isnull().sum().sum()
-    log(f"Missing values in train: {n_missing:,}")
-
-    return train, test
+    
 
 # ══════════════════════════════════════════════════════════════════════════════
-# ❹  STEP 2 — EDA DASHBOARD
+# ❹  STEP 2 — FEATURE ENGINEERING
 # ══════════════════════════════════════════════════════════════════════════════
 def run_eda(df: pd.DataFrame) -> None:
     log("Generating EDA dashboard…", "CHART")
