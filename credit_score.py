@@ -180,7 +180,7 @@ for cs,c,l in zip([0,1,2],COLORS,["Poor","Standard","Good"]):
              alpha=0.65,label=l,color=c,bins=35); ax7.set_title("Monthly Balance",fontweight="bold")
 ax7.legend(fontsize=8,facecolor="#1a1d27",labelcolor="white")
 
-fig.suptitle("🏆 CREDIT SCORE — GOD-LEVEL EDA DASHBOARD",fontsize=16,fontweight="bold",color="#00d4ff",y=1.01)
+fig.suptitle("🏆 CREDIT SCORE — EDA DASHBOARD",fontsize=16,fontweight="bold",color="#00d4ff",y=1.01)
 plt.savefig(OUT/"charts"/"01_eda_dashboard.png",dpi=150,bbox_inches="tight",facecolor="#0f1117"); plt.close()
 log("EDA dashboard saved", "OK")
 
