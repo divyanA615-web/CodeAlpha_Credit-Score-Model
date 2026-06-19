@@ -1,0 +1,54 @@
+
+╔══════════════════════════════════════════════════════════════════╗
+║         🏆 CREDIT SCORE PIPELINE — FINAL REPORT        ║
+╚══════════════════════════════════════════════════════════════════╝
+Generated : 2026-06-19 13:46:32
+Features  : 59 engineered features
+CV        : 5-Fold Stratified KFold
+
+══════════════ CROSS-VALIDATION RESULTS ════════════════════════════
+LightGBM  F1: 0.8245 ± 0.0036
+XGBoost   F1: 0.8204 ± 0.0026
+CatBoost  F1: 0.7818 ± 0.0048
+
+★ Ensemble OOF Weighted-F1 : 0.8179
+★ Ensemble OOF Accuracy    : 0.8177
+
+══════════════ CLASSIFICATION REPORT ══════════════════════════════
+              precision    recall  f1-score   support
+
+        Poor       0.80      0.82      0.81     27485
+    Standard       0.84      0.82      0.83     51503
+        Good       0.78      0.80      0.79     17708
+
+    accuracy                           0.82     96696
+   macro avg       0.81      0.81      0.81     96696
+weighted avg       0.82      0.82      0.82     96696
+
+
+══════════════ CONFUSION MATRIX ════════════════════════════════════
+[[22565  4581   339]
+ [ 5513 42339  3651]
+ [   59  3484 14165]]
+(rows=True Label, cols=Predicted | 0=Poor 1=Standard 2=Good)
+
+══════════════ TOP-10 FEATURES BY IMPORTANCE ════════════════════════
+                 feature  importance
+    changed_credit_limit     10465.0
+        age_x_credit_age      9142.0
+            inquiry_rate      8767.4
+credit_utilization_ratio      8189.0
+           debt_per_card      8076.0
+      credit_history_age      8033.2
+                     age      7615.6
+           interest_rate      7484.4
+          delay_severity      7460.8
+            util_x_delay      7365.8
+
+══════════════ ARTIFACTS ════════════════════════════════════════════
+models/lgbm_best.pkl   | models/xgb_best.pkl  | models/catboost_best.cbm
+models/best_hyperparams.json | models/feature_columns.json
+charts/01_eda_dashboard.png  | charts/02_performance_dashboard.png
+charts/03_feature_importance.png | charts/04_shap_importance.png | charts/05_shap_beeswarm.png
+reports/pipeline_report.txt
+
